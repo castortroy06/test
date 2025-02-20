@@ -1,0 +1,58 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./:/var/www/html/test
+    depends_on:
+      - php
+      - postgres
+    networks:
+      - yii2net
+
+  php:
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - ./:/var/www/html/test
+    user: "1000:1001"
+    depends_on:
+      - postgres
+    networks:
+      - yii2net
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: loans
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - yii2net
+
+  phppgadmin:
+    image: dockage/phppgadmin:latest
+    environment:
+      PHP_PG_ADMIN_SERVER_HOST: postgres
+      PHP_PG_ADMIN_SERVER_PORT: 5432
+      PHP_PG_ADMIN_SERVER_DEFAULT_DB: loans
+      PHP_PG_ADMIN_SERVER_DESC: "PostgreSQL Server"
+    ports:
+      - "8080:80"  # phpPgAdmin will be accessible at port 8080 on the host
+    depends_on:
+      - postgres
+    networks:
+      - yii2net
+
+networks:
+  yii2net:
+
+volumes:
+  postgres-data:
