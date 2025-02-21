@@ -78,10 +78,10 @@ class ProcessorController extends Controller
         $declinedIds = [];
         foreach ($requests as $request) {
             $randomNumber = mt_rand(1, 100);
-            if ($randomNumber <= 10) {
-                $approvedIds[$request->id] = $request->id;
+            if ($randomNumber <= 10 && !isset($approvedIds[$request->user_id])) {
+                $approvedIds[$request->user_id] = $request->id;
             } else {
-                $declinedIds[$request->id] = $request->id;
+                $declinedIds[] = $request->id;
             }
         }
 
